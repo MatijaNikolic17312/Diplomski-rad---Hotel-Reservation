@@ -1,7 +1,7 @@
 # Diplomski rad - Hotel Reservation
 Diplomski rad, implementacija sistema za hotelske rezervacije u Oracle APEX-u
 
-Instrukcije za instalaciju projekta.
+Instrukcije za instalaciju projekta:
 1. Preko SQL Developer-a, povezati se na admin korisnika baze podataka
 2. Pokrenuti skriptu *00_HOTEL_RES_Schema_DDL.sql*
 3. Dodati konekciju na istu bazu, ali sada sa novim **PLAYGROUND** korisnikom.
