@@ -16,6 +16,7 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.0.1			NOV-27-2024		Ispravke u F02						M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 
@@ -79,7 +80,7 @@ begin
     
     while iday <= trunc_period_end_dt
     loop
-        select sum(num_of_guests) into var_num_of_guests from e_reservations where iday between start_dt and end_dt;
+        select sum(num_of_guests) into var_num_of_guests from e_reservations where iday between start_dt and end_dt and curr_status <> 'CANCELED';
         ret_tab := T_DASH_GUEST_NUM_rec(iday, var_num_of_guests);
         iday := iday + 1;
         
