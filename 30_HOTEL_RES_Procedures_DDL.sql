@@ -15,6 +15,7 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.0.1			DEC-02-2024		Ispravke u P01						M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 
@@ -59,11 +60,12 @@ BEGIN
         EXIT WHEN cur%NOTFOUND;
         
         --Step 04 Get number of days that was room occupied
-        select sum(end_dt - start_dt) into var_num_of_days
+        select sum(case when end_dt > period_end_dt then period_end_dt else end_dt end - start_dt) into var_num_of_days
         from e_reservations r
         inner join e_reservation_rooms rr on r.reservation_cd = rr.reservation_cd
         where start_dt BETWEEN period_start_dt and period_end_dt
-        and room_num = var_room_num;
+        and room_num = var_room_num
+        and curr_status <> 'CANCELED';
         
         --Step 05 Generate random color for graphing
         var_color :=  '#' || to_char(dbms_random.value(0,256),'fm0X') || to_char(dbms_random.value(0,256),'fm0X') || to_char(dbms_random.value(0,256),'fm0X');

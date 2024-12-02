@@ -33,16 +33,16 @@ prompt APPLICATION 100 - Hotel Reservation Application - HRA
 -- Application Export:
 --   Application:     100
 --   Name:            Hotel Reservation Application - HRA
---   Date and Time:   12:00 Wednesday November 20, 2024
+--   Date and Time:   18:54 Monday December 2, 2024
 --   Exported By:     MNIKOLIC
 --   Flashback:       0
 --   Export Type:     Application Export
---     Pages:                     22
---       Items:                   96
+--     Pages:                     23
+--       Items:                   99
 --       Processes:               24
---       Regions:                 47
---       Buttons:                 19
---       Dynamic Actions:         15
+--       Regions:                 55
+--       Buttons:                 20
+--       Dynamic Actions:         17
 --     Shared Components:
 --       Logic:
 --         Build Options:          2
@@ -121,7 +121,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_01=>'APP_NAME'
 ,p_substitution_value_01=>'Hotel Reservation App'
 ,p_last_updated_by=>'MNIKOLIC'
-,p_last_upd_yyyymmddhh24miss=>'20241031220322'
+,p_last_upd_yyyymmddhh24miss=>'20241202184654'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>6
 ,p_print_server_type=>'NATIVE'
@@ -243,7 +243,7 @@ wwv_flow_imp_shared.create_list_item(
  p_id=>wwv_flow_imp.id(11838795258246096)
 ,p_list_item_display_sequence=>80
 ,p_list_item_link_text=>'Dashboard'
-,p_list_item_link_target=>'f?p=&APP_ID.:16:&APP_SESSION.::&DEBUG.:::'
+,p_list_item_link_target=>'f?p=&APP_ID.:18:&SESSION.::&DEBUG.::::'
 ,p_list_item_icon=>'fa-area-chart'
 ,p_parent_list_item_id=>wwv_flow_imp.id(11538413436153448)
 ,p_list_item_current_type=>'COLON_DELIMITED_PAGE_LIST'
@@ -18975,6 +18975,15 @@ wwv_flow_imp_page.create_page(
 '   }',
 '}]);',
 '',
+'apex.actions.add([{',
+'    name: "noshow",',
+'    action: (event, element, args) => {',
+'        apex.items.P1_ACTION_ID.value = args.id;',
+'		console.log("cao");',
+'        apex.event.trigger(document, ''action-noshow'');',
+'        }',
+'    }]);',
+'',
 'if (apex.items.P1_NUM_OF_NEW_RES.value !== "0")',
 '	$(''#items_count'').css(''font-weight'',''bold'');'))
 ,p_inline_css=>wwv_flow_string.join(wwv_flow_t_varchar2(
@@ -18987,7 +18996,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MNIKOLIC'
-,p_last_upd_yyyymmddhh24miss=>'20241020211919'
+,p_last_upd_yyyymmddhh24miss=>'20241129132336'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(8542904276218802)
@@ -19342,6 +19351,21 @@ wwv_flow_imp_page.create_region_column(
 ,p_enable_hide=>true
 ,p_escape_on_http_output=>true
 );
+wwv_flow_imp_page.create_region_column(
+ p_id=>wwv_flow_imp.id(14345745092079838)
+,p_name=>'NO_SHOW'
+,p_source_type=>'NONE'
+,p_item_type=>'NATIVE_LINK'
+,p_heading=>'Oznaci kao nedolazak'
+,p_heading_alignment=>'LEFT'
+,p_display_sequence=>130
+,p_value_alignment=>'CENTER'
+,p_link_target=>'#action$noshow?id=&RESERVATION_CD.'
+,p_link_text=>'<span class="fa fa-times-circle" aria-hidden="true"></span>'
+,p_use_as_row_header=>false
+,p_enable_hide=>true
+,p_escape_on_http_output=>true
+);
 wwv_flow_imp_page.create_interactive_grid(
  p_id=>wwv_flow_imp.id(8543120571218804)
 ,p_internal_uid=>8543120571218804
@@ -19478,6 +19502,14 @@ wwv_flow_imp_page.create_ig_report_column(
 ,p_is_visible=>true
 ,p_is_frozen=>false
 );
+wwv_flow_imp_page.create_ig_report_column(
+ p_id=>wwv_flow_imp.id(15541751353090435)
+,p_view_id=>wwv_flow_imp.id(8548581040227931)
+,p_display_seq=>13
+,p_column_id=>wwv_flow_imp.id(14345745092079838)
+,p_is_visible=>true
+,p_is_frozen=>false
+);
 wwv_flow_imp_page.create_ig_report_highlight(
  p_id=>wwv_flow_imp.id(68058000040)
 ,p_view_id=>wwv_flow_imp.id(8548581040227931)
@@ -19489,6 +19521,19 @@ wwv_flow_imp_page.create_ig_report_highlight(
 ,p_condition_operator=>'EQ'
 ,p_condition_is_case_sensitive=>false
 ,p_condition_expression=>unistr('Gosti su do\0161li')
+,p_is_enabled=>true
+);
+wwv_flow_imp_page.create_ig_report_highlight(
+ p_id=>wwv_flow_imp.id(144329005266)
+,p_view_id=>wwv_flow_imp.id(8548581040227931)
+,p_execution_seq=>10
+,p_name=>unistr('Gosti koji nisu do\0161li')
+,p_background_color=>'#e8e8e8'
+,p_condition_type=>'COLUMN'
+,p_condition_column_id=>wwv_flow_imp.id(10634271075297717)
+,p_condition_operator=>'EQ'
+,p_condition_is_case_sensitive=>false
+,p_condition_expression=>'Nije se pojavio'
 ,p_is_enabled=>true
 );
 wwv_flow_imp_page.create_page_plug(
@@ -19573,6 +19618,65 @@ wwv_flow_imp_page.create_page_da_action(
 wwv_flow_imp_page.create_page_da_action(
  p_id=>wwv_flow_imp.id(10635070449297725)
 ,p_event_id=>wwv_flow_imp.id(10634838016297723)
+,p_event_result=>'TRUE'
+,p_action_sequence=>30
+,p_execute_on_page_init=>'N'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(8542904276218802)
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(14345864495079839)
+,p_name=>'action-noshow'
+,p_event_sequence=>20
+,p_triggering_element_type=>'JAVASCRIPT_EXPRESSION'
+,p_triggering_element=>'document'
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'custom'
+,p_bind_event_type_custom=>'action-noshow'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14345961250079840)
+,p_event_id=>wwv_flow_imp.id(14345864495079839)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_action=>'NATIVE_CONFIRM'
+,p_attribute_01=>'Da li ste sigurni da gost nije dosao?'
+,p_attribute_02=>'Potvrda dolaska'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346089127079841)
+,p_event_id=>wwv_flow_imp.id(14345864495079839)
+,p_event_result=>'TRUE'
+,p_action_sequence=>20
+,p_execute_on_page_init=>'N'
+,p_action=>'NATIVE_EXECUTE_PLSQL_CODE'
+,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'declare',
+'	email e_reservations.user_mail%type;',
+'begin',
+'    update e_reservations',
+'    set curr_status = ''NO SHOW''',
+'    where reservation_cd = :P1_ACTION_ID',
+'	returning user_mail into email;',
+'',
+'	WRAPPERS_MAIL_SENDING_TEMPLATES2.send_noshow ',
+'	(  ',
+'		MAIL => email,',
+'		RESERVATION_CD => :P1_ACTION_ID',
+'	);',
+'    ',
+'    commit;',
+'end;'))
+,p_attribute_02=>'P1_ACTION_ID'
+,p_attribute_05=>'PLSQL'
+,p_wait_for_result=>'Y'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346176790079842)
+,p_event_id=>wwv_flow_imp.id(14345864495079839)
 ,p_event_result=>'TRUE'
 ,p_action_sequence=>30
 ,p_execute_on_page_init=>'N'
@@ -19999,7 +20103,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'21'
 ,p_last_updated_by=>'MNIKOLIC'
-,p_last_upd_yyyymmddhh24miss=>'20241028194748'
+,p_last_upd_yyyymmddhh24miss=>'20241129133200'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(7573713816042032)
@@ -20578,6 +20682,32 @@ wwv_flow_imp_page.create_ig_report_column(
 ,p_is_visible=>true
 ,p_is_frozen=>false
 );
+wwv_flow_imp_page.create_ig_report_highlight(
+ p_id=>wwv_flow_imp.id(54389000000)
+,p_view_id=>wwv_flow_imp.id(7616960081180590)
+,p_execution_seq=>5
+,p_name=>'Gosti se nisu pojavili'
+,p_background_color=>'#e8e8e8'
+,p_condition_type=>'COLUMN'
+,p_condition_column_id=>wwv_flow_imp.id(11147916142662416)
+,p_condition_operator=>'EQ'
+,p_condition_is_case_sensitive=>false
+,p_condition_expression=>'Nije se pojavio'
+,p_is_enabled=>true
+);
+wwv_flow_imp_page.create_ig_report_highlight(
+ p_id=>wwv_flow_imp.id(167210004226)
+,p_view_id=>wwv_flow_imp.id(7616960081180590)
+,p_execution_seq=>10
+,p_name=>unistr('Gosti su do\0161li')
+,p_background_color=>'#fff5ce'
+,p_condition_type=>'COLUMN'
+,p_condition_column_id=>wwv_flow_imp.id(11147916142662416)
+,p_condition_operator=>'EQ'
+,p_condition_is_case_sensitive=>false
+,p_condition_expression=>unistr('Gosti su do\0161li')
+,p_is_enabled=>true
+);
 wwv_flow_imp_page.create_ig_report(
  p_id=>wwv_flow_imp.id(21355867074486623)
 ,p_interactive_grid_id=>wwv_flow_imp.id(7616354166180589)
@@ -20728,6 +20858,32 @@ wwv_flow_imp_page.create_ig_report_column(
 ,p_column_id=>wwv_flow_imp.id(11148713230662424)
 ,p_is_visible=>true
 ,p_is_frozen=>false
+);
+wwv_flow_imp_page.create_ig_report_highlight(
+ p_id=>wwv_flow_imp.id(84881000001)
+,p_view_id=>wwv_flow_imp.id(21356045724486623)
+,p_execution_seq=>10
+,p_name=>unistr('Gosti koji nisu do\0161li')
+,p_background_color=>'#e8e8e8'
+,p_condition_type=>'COLUMN'
+,p_condition_column_id=>wwv_flow_imp.id(11147916142662416)
+,p_condition_operator=>'EQ'
+,p_condition_is_case_sensitive=>false
+,p_condition_expression=>'Nije se pojavio'
+,p_is_enabled=>true
+);
+wwv_flow_imp_page.create_ig_report_highlight(
+ p_id=>wwv_flow_imp.id(118376000001)
+,p_view_id=>wwv_flow_imp.id(21356045724486623)
+,p_execution_seq=>5
+,p_name=>unistr('Gosti koji su do\0161li')
+,p_background_color=>'#fff5ce'
+,p_condition_type=>'COLUMN'
+,p_condition_column_id=>wwv_flow_imp.id(11147916142662416)
+,p_condition_operator=>'EQ'
+,p_condition_is_case_sensitive=>false
+,p_condition_expression=>unistr('Gosti su do\0161li')
+,p_is_enabled=>true
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(11148047505662417)
@@ -26601,6 +26757,752 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
 ,p_report_columns=>'ROOM_NUM:PERSONS:CONFIG'
+);
+end;
+/
+prompt --application/pages/page_00018
+begin
+wwv_flow_imp_page.create_page(
+ p_id=>18
+,p_name=>'Dashboard v2'
+,p_alias=>'DASHBOARD-V2'
+,p_step_title=>'Statistika'
+,p_warn_on_unsaved_changes=>'N'
+,p_autocomplete_on_off=>'OFF'
+,p_inline_css=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'#periodDates',
+'{',
+'	background-color: rgb(253,253,253);',
+'}',
+'',
+'#gauge-util',
+'{',
+'	align: center;',
+'}'))
+,p_page_template_options=>'#DEFAULT#'
+,p_protection_level=>'C'
+,p_browser_cache=>'N'
+,p_page_comment=>'U room utilization grafikonu stoji nevidljiv karakter'
+,p_page_component_map=>'04'
+,p_last_updated_by=>'MNIKOLIC'
+,p_last_upd_yyyymmddhh24miss=>'20241202184654'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(14346288111079843)
+,p_plug_name=>'Period'
+,p_region_name=>'periodDates'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--accent8:t-Region--noBorder:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>10
+,p_plug_grid_column_span=>4
+,p_plug_display_column=>5
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(27537673866361333)
+,p_plug_name=>'Price range'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_component_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>60
+,p_plug_new_grid_row=>false
+,p_plug_source_type=>'NATIVE_JET_CHART'
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15747165438047359)
+,p_region_id=>wwv_flow_imp.id(27537673866361333)
+,p_chart_type=>'bar'
+,p_title=>'Broj rezervacija po cenovnom rangu'
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_orientation=>'vertical'
+,p_data_cursor=>'auto'
+,p_data_cursor_behavior=>'auto'
+,p_hover_behavior=>'dim'
+,p_stack=>'off'
+,p_connect_nulls=>'Y'
+,p_sorting=>'label-asc'
+,p_fill_multi_series_gaps=>true
+,p_zoom_and_scroll=>'off'
+,p_tooltip_rendered=>'Y'
+,p_show_series_name=>false
+,p_show_group_name=>true
+,p_show_value=>true
+,p_legend_rendered=>'off'
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15748870216047361)
+,p_chart_id=>wwv_flow_imp.id(15747165438047359)
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'SQL'
+,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select LABEL,',
+'       VALUE,',
+'       COLOR',
+'from DASH_PRICE_RANGE',
+'(',
+'	period_start_dt => case when :P18_REPORT_START_DT is not null then to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY'') else null end,',
+'    period_end_dt => case when :P18_REPORT_END_DT is not null then to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'') else null end',
+');'))
+,p_items_value_column_name=>'VALUE'
+,p_items_label_column_name=>'LABEL'
+,p_color=>'&COLOR.'
+,p_assigned_to_y2=>'off'
+,p_items_label_rendered=>true
+,p_items_label_position=>'outsideSlice'
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15747619180047360)
+,p_chart_id=>wwv_flow_imp.id(15747165438047359)
+,p_axis=>'x'
+,p_is_rendered=>'on'
+,p_title=>'Cena'
+,p_format_scaling=>'auto'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_tick_label_rotation=>'auto'
+,p_tick_label_position=>'outside'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15748292832047360)
+,p_chart_id=>wwv_flow_imp.id(15747165438047359)
+,p_axis=>'y'
+,p_is_rendered=>'on'
+,p_title=>'Broj rezervacija'
+,p_format_type=>'decimal'
+,p_decimal_places=>0
+,p_format_scaling=>'none'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_position=>'auto'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(27538190191361338)
+,p_plug_name=>'Length of stay'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_component_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>70
+,p_plug_grid_column_span=>6
+,p_plug_source_type=>'NATIVE_JET_CHART'
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15749810142047362)
+,p_region_id=>wwv_flow_imp.id(27538190191361338)
+,p_chart_type=>'bar'
+,p_title=>unistr('Broj rezervacija po du\017Eini trajanja odsedanja')
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_orientation=>'vertical'
+,p_data_cursor=>'auto'
+,p_data_cursor_behavior=>'auto'
+,p_hover_behavior=>'dim'
+,p_stack=>'off'
+,p_connect_nulls=>'Y'
+,p_sorting=>'label-asc'
+,p_fill_multi_series_gaps=>true
+,p_zoom_and_scroll=>'off'
+,p_tooltip_rendered=>'Y'
+,p_show_series_name=>false
+,p_show_group_name=>true
+,p_show_value=>true
+,p_legend_rendered=>'off'
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15751406387047364)
+,p_chart_id=>wwv_flow_imp.id(15749810142047362)
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'SQL'
+,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select LABEL,',
+'       VALUE,',
+'       COLOR',
+'from DASH_LENGTH_OF_STAY',
+'(',
+'	period_start_dt => case when :P18_REPORT_START_DT is not null then to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY'') else null end,',
+'    period_end_dt => case when :P18_REPORT_END_DT is not null then to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'') else null end',
+');'))
+,p_items_value_column_name=>'VALUE'
+,p_items_label_column_name=>'LABEL'
+,p_color=>'&COLOR.'
+,p_assigned_to_y2=>'off'
+,p_items_label_rendered=>true
+,p_items_label_position=>'outsideSlice'
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15750385267047363)
+,p_chart_id=>wwv_flow_imp.id(15749810142047362)
+,p_axis=>'x'
+,p_is_rendered=>'on'
+,p_title=>'Broj dana'
+,p_format_scaling=>'auto'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_tick_label_rotation=>'auto'
+,p_tick_label_position=>'outside'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15750870793047363)
+,p_chart_id=>wwv_flow_imp.id(15749810142047362)
+,p_axis=>'y'
+,p_is_rendered=>'on'
+,p_title=>'Broj rezervacija'
+,p_format_type=>'decimal'
+,p_decimal_places=>0
+,p_format_scaling=>'none'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_position=>'auto'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(27538715170361343)
+,p_plug_name=>'Num of guest per day'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_component_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>80
+,p_plug_new_grid_row=>false
+,p_plug_grid_column_span=>6
+,p_plug_source_type=>'NATIVE_JET_CHART'
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15738590459047318)
+,p_region_id=>wwv_flow_imp.id(27538715170361343)
+,p_chart_type=>'line'
+,p_title=>'Broj gostiju u proizvoljnom periodu'
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_orientation=>'vertical'
+,p_data_cursor=>'auto'
+,p_data_cursor_behavior=>'auto'
+,p_hover_behavior=>'dim'
+,p_stack=>'off'
+,p_connect_nulls=>'Y'
+,p_sorting=>'label-asc'
+,p_fill_multi_series_gaps=>true
+,p_zoom_and_scroll=>'off'
+,p_tooltip_rendered=>'Y'
+,p_show_series_name=>false
+,p_show_group_name=>true
+,p_show_value=>true
+,p_show_label=>false
+,p_show_row=>false
+,p_show_start=>false
+,p_show_end=>false
+,p_show_progress=>false
+,p_show_baseline=>false
+,p_legend_rendered=>'off'
+,p_show_gauge_value=>false
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15740280905047327)
+,p_chart_id=>wwv_flow_imp.id(15738590459047318)
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'SQL'
+,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select ',
+'	to_char("D_DATE", ''DD.MM.YYYY.'') "LABEL",',
+'	"NUM_OF_GUESTS" "VALUE" ',
+'from TABLE ( get_latest_guest_num2(to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY''), to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'')));'))
+,p_items_value_column_name=>'VALUE'
+,p_items_label_column_name=>'LABEL'
+,p_line_style=>'dashed'
+,p_line_type=>'auto'
+,p_marker_rendered=>'on'
+,p_marker_shape=>'circle'
+,p_assigned_to_y2=>'off'
+,p_items_label_rendered=>true
+,p_items_label_position=>'aboveMarker'
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15739094949047324)
+,p_chart_id=>wwv_flow_imp.id(15738590459047318)
+,p_axis=>'x'
+,p_is_rendered=>'on'
+,p_title=>'Datum'
+,p_format_scaling=>'auto'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_tick_label_rotation=>'auto'
+,p_tick_label_position=>'outside'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15739603097047326)
+,p_chart_id=>wwv_flow_imp.id(15738590459047318)
+,p_axis=>'y'
+,p_is_rendered=>'on'
+,p_title=>'Broj gostiju'
+,p_format_type=>'decimal'
+,p_decimal_places=>0
+,p_format_scaling=>'none'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_position=>'auto'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(27577001480293370)
+,p_plug_name=>'Statistika'
+,p_region_template_options=>'#DEFAULT#:t-BreadcrumbRegion--useRegionTitle'
+,p_plug_template=>wwv_flow_imp.id(6603598056402197)
+,p_plug_display_sequence=>10
+,p_plug_display_point=>'REGION_POSITION_01'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(27577706225293377)
+,p_plug_name=>'Breakfast option choosen'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>50
+,p_plug_grid_column_span=>6
+,p_plug_source_type=>'NATIVE_JET_CHART'
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15745206445047353)
+,p_region_id=>wwv_flow_imp.id(27577706225293377)
+,p_chart_type=>'pie'
+,p_title=>unistr('Broj rezervacija sa doru\010Dkom')
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_data_cursor=>'auto'
+,p_data_cursor_behavior=>'auto'
+,p_hover_behavior=>'dim'
+,p_value_format_type=>'decimal'
+,p_value_decimal_places=>0
+,p_value_format_scaling=>'none'
+,p_fill_multi_series_gaps=>false
+,p_tooltip_rendered=>'Y'
+,p_show_series_name=>false
+,p_show_group_name=>false
+,p_show_value=>true
+,p_show_label=>false
+,p_show_row=>false
+,p_show_start=>false
+,p_show_end=>false
+,p_show_progress=>false
+,p_show_baseline=>false
+,p_legend_rendered=>'off'
+,p_pie_other_threshold=>0
+,p_pie_selection_effect=>'highlight'
+,p_show_gauge_value=>false
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15745739536047353)
+,p_chart_id=>wwv_flow_imp.id(15745206445047353)
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'SQL'
+,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select ',
+'	LABEL,',
+'    VALUE',
+'from DASH_BREAKFAST',
+'(',
+'	period_start_dt => case when :P18_REPORT_START_DT is not null then to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY'') else null end,',
+'    period_end_dt => case when :P18_REPORT_END_DT is not null then to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'') else null end',
+');'))
+,p_items_value_column_name=>'VALUE'
+,p_items_label_column_name=>'LABEL'
+,p_items_label_rendered=>true
+,p_items_label_position=>'outsideSlice'
+,p_items_label_display_as=>'ALL'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(30081611711127025)
+,p_plug_name=>'Room utilization in last X days'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_component_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>40
+,p_plug_new_grid_row=>false
+,p_plug_source_type=>'NATIVE_JET_CHART'
+,p_plug_footer=>unistr('\200F\200F\200E \200E')
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15742588059047351)
+,p_region_id=>wwv_flow_imp.id(30081611711127025)
+,p_chart_type=>'bar'
+,p_title=>'Popunjenost soba '
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_orientation=>'vertical'
+,p_data_cursor=>'auto'
+,p_data_cursor_behavior=>'auto'
+,p_hover_behavior=>'dim'
+,p_stack=>'off'
+,p_connect_nulls=>'Y'
+,p_sorting=>'label-asc'
+,p_fill_multi_series_gaps=>true
+,p_zoom_and_scroll=>'off'
+,p_tooltip_rendered=>'Y'
+,p_show_series_name=>false
+,p_show_group_name=>true
+,p_show_value=>true
+,p_legend_rendered=>'off'
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15744282807047352)
+,p_chart_id=>wwv_flow_imp.id(15742588059047351)
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'TABLE'
+,p_query_table=>'V_DASH_ROOM_UTILZATION'
+,p_include_rowid_column=>false
+,p_items_value_column_name=>'PERCENTAGE'
+,p_items_label_column_name=>'ROOM_NUM'
+,p_color=>'&COLOR.'
+,p_assigned_to_y2=>'off'
+,p_items_label_rendered=>true
+,p_items_label_position=>'aboveMarker'
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15743023398047351)
+,p_chart_id=>wwv_flow_imp.id(15742588059047351)
+,p_axis=>'x'
+,p_is_rendered=>'on'
+,p_title=>'Broj sobe'
+,p_format_scaling=>'auto'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_tick_label_rotation=>'auto'
+,p_tick_label_position=>'outside'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_jet_chart_axis(
+ p_id=>wwv_flow_imp.id(15743681552047351)
+,p_chart_id=>wwv_flow_imp.id(15742588059047351)
+,p_axis=>'y'
+,p_is_rendered=>'on'
+,p_title=>'Stepen popunjenosti'
+,p_format_type=>'percent'
+,p_decimal_places=>0
+,p_format_scaling=>'none'
+,p_scaling=>'linear'
+,p_baseline_scaling=>'zero'
+,p_position=>'auto'
+,p_major_tick_rendered=>'on'
+,p_minor_tick_rendered=>'off'
+,p_tick_label_rendered=>'on'
+,p_zoom_order_seconds=>false
+,p_zoom_order_minutes=>false
+,p_zoom_order_hours=>false
+,p_zoom_order_days=>false
+,p_zoom_order_weeks=>false
+,p_zoom_order_months=>false
+,p_zoom_order_quarters=>false
+,p_zoom_order_years=>false
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(30083257276127041)
+,p_plug_name=>'Current Hotel Utilization'
+,p_region_name=>'gauge'
+,p_region_template_options=>'#DEFAULT#:t-Region--removeHeader js-removeLandmark:t-Region--scrollBody'
+,p_component_template_options=>'#DEFAULT#'
+,p_escape_on_http_output=>'Y'
+,p_plug_template=>wwv_flow_imp.id(6591175368402192)
+,p_plug_display_sequence=>20
+,p_plug_grid_column_span=>6
+,p_plug_source_type=>'NATIVE_JET_CHART'
+,p_plug_footer=>unistr('Ovaj grafikon se odnosi samo na dana\0161nji dan!')
+);
+wwv_flow_imp_page.create_jet_chart(
+ p_id=>wwv_flow_imp.id(15752415258047366)
+,p_region_id=>wwv_flow_imp.id(30083257276127041)
+,p_chart_type=>'dial'
+,p_width=>'400'
+,p_height=>'400'
+,p_animation_on_display=>'auto'
+,p_animation_on_data_change=>'auto'
+,p_value_text_type=>'percent'
+,p_value_format_type=>'percent'
+,p_value_decimal_places=>2
+,p_value_format_scaling=>'auto'
+,p_tooltip_rendered=>'Y'
+,p_gauge_orientation=>'circular'
+,p_gauge_indicator_size=>1
+,p_gauge_inner_radius=>.7
+,p_gauge_plot_area=>'on'
+,p_gauge_start_angle=>180
+,p_gauge_angle_extent=>180
+,p_show_gauge_value=>true
+);
+wwv_flow_imp_page.create_jet_chart_series(
+ p_id=>wwv_flow_imp.id(15752972409047366)
+,p_chart_id=>wwv_flow_imp.id(15752415258047366)
+,p_static_id=>'gauge1'
+,p_seq=>10
+,p_name=>'Series 1'
+,p_data_source_type=>'TABLE'
+,p_query_table=>'V_DASH_CURR_HOTEL_UTILIZATION'
+,p_include_rowid_column=>false
+,p_items_value_column_name=>'VALUE'
+,p_items_max_value=>'MAX_VALUE'
+,p_items_label_column_name=>'LABEL'
+,p_color=>'#ff3b30'
+,p_items_label_rendered=>true
+,p_items_label_position=>'auto'
+,p_gauge_plot_area_color=>'#c7c7cc'
+,p_threshold_display=>'onIndicator'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(15740846350047330)
+,p_button_sequence=>50
+,p_button_plug_id=>wwv_flow_imp.id(14346288111079843)
+,p_button_name=>'APPLY_VALUES'
+,p_button_action=>'DEFINED_BY_DA'
+,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--stretch'
+,p_button_template_id=>wwv_flow_imp.id(6664486134402226)
+,p_button_image_alt=>'Osvezi'
+,p_warn_on_unsaved_changes=>null
+,p_icon_css_classes=>'fa-refresh'
+,p_grid_new_row=>'Y'
+,p_grid_column_span=>4
+,p_grid_column=>5
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(30083674396127140)
+,p_name=>'P18_REPORT_START_DT'
+,p_item_sequence=>10
+,p_item_plug_id=>wwv_flow_imp.id(14346288111079843)
+,p_item_default=>'select sysdate - 30 from dual'
+,p_item_default_type=>'SQL_QUERY'
+,p_prompt=>unistr('Po\010Detak perioda')
+,p_display_as=>'NATIVE_DATE_PICKER_APEX'
+,p_cSize=>30
+,p_field_template=>wwv_flow_imp.id(6661836084402224)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'N'
+,p_attribute_02=>'POPUP'
+,p_attribute_03=>'NONE'
+,p_attribute_06=>'NONE'
+,p_attribute_09=>'N'
+,p_attribute_11=>'Y'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(30083870170127141)
+,p_name=>'P18_REPORT_END_DT'
+,p_item_sequence=>20
+,p_item_plug_id=>wwv_flow_imp.id(14346288111079843)
+,p_item_default=>'select sysdate from dual'
+,p_item_default_type=>'SQL_QUERY'
+,p_prompt=>'Kraj perioda'
+,p_display_as=>'NATIVE_DATE_PICKER_APEX'
+,p_cSize=>30
+,p_begin_on_new_line=>'N'
+,p_field_template=>wwv_flow_imp.id(6661836084402224)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'N'
+,p_attribute_02=>'POPUP'
+,p_attribute_03=>'NONE'
+,p_attribute_06=>'NONE'
+,p_attribute_09=>'N'
+,p_attribute_11=>'Y'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(30083878654127142)
+,p_name=>'P18_NUM_OF_DAYS'
+,p_item_sequence=>40
+,p_item_plug_id=>wwv_flow_imp.id(14346288111079843)
+,p_item_default=>'30 dana'
+,p_prompt=>'Broj dana'
+,p_display_as=>'NATIVE_TEXT_FIELD'
+,p_cSize=>30
+,p_begin_on_new_line=>'N'
+,p_read_only_when_type=>'ALWAYS'
+,p_field_template=>wwv_flow_imp.id(6661836084402224)
+,p_item_template_options=>'#DEFAULT#'
+,p_attribute_01=>'N'
+,p_attribute_02=>'N'
+,p_attribute_04=>'TEXT'
+,p_attribute_05=>'BOTH'
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(15753707951047404)
+,p_name=>'action-set-period'
+,p_event_sequence=>10
+,p_triggering_element_type=>'BUTTON'
+,p_triggering_button_id=>wwv_flow_imp.id(15740846350047330)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'click'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(15754214348047414)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'Y'
+,p_action=>'NATIVE_SET_VALUE'
+,p_affected_elements_type=>'ITEM'
+,p_affected_elements=>'P18_NUM_OF_DAYS'
+,p_attribute_01=>'SQL_STATEMENT'
+,p_attribute_03=>'select to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'') - to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY'') || '' dana'' from dual;'
+,p_attribute_07=>'P18_REPORT_START_DT,P18_REPORT_END_DT'
+,p_attribute_08=>'Y'
+,p_attribute_09=>'N'
+,p_wait_for_result=>'Y'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346626435079847)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>20
+,p_execute_on_page_init=>'N'
+,p_name=>'Run Room Utilization Proc'
+,p_action=>'NATIVE_EXECUTE_PLSQL_CODE'
+,p_attribute_01=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'DECLARE',
+'    period_start_dt DATE;',
+'    period_end_dt   DATE;',
+'BEGIN',
+'    period_start_dt := case when :P18_REPORT_START_DT is not null then to_date(:P18_REPORT_START_DT, ''DD.MM.YYYY'') else null end;',
+'    period_end_dt := case when :P18_REPORT_END_DT is not null then to_date(:P18_REPORT_END_DT, ''DD.MM.YYYY'') else null end;',
+'    populate_tmp_room_utilization(period_start_dt => period_start_dt, period_end_dt => period_end_dt);',
+'--rollback; ',
+'END;'))
+,p_attribute_05=>'PLSQL'
+,p_wait_for_result=>'Y'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(15754710206047420)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>30
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh room utilzation'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(30081611711127025)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346794438079848)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>40
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh breakfast dash'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(27577706225293377)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346837060079849)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>50
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh price range dash'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(27537673866361333)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(14346981345079850)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>60
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh lenght of stay dash'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(27538190191361338)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(15942267693380301)
+,p_event_id=>wwv_flow_imp.id(15753707951047404)
+,p_event_result=>'TRUE'
+,p_action_sequence=>70
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh num of guests per day'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(27538715170361343)
 );
 end;
 /

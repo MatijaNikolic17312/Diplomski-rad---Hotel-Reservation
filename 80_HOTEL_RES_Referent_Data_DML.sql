@@ -12,6 +12,7 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.1.0			DEC-02-2024		Dodato novo stanje rezervacije		M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 REM INSERTING into PLAYGROUND.E_LOV
@@ -26,3 +27,4 @@ Insert into PLAYGROUND.E_LOV (ID,KEY,VALUE,TYPE,CREATED,CREATED_BY,UPDATED,UPDAT
 Insert into PLAYGROUND.E_LOV (ID,KEY,VALUE,TYPE,CREATED,CREATED_BY,UPDATED,UPDATED_BY) values (1,'SMTP_PASS','<SMTP SIFRA>','SYS_CONFIG',to_date('04-OCT-2024 00:00:00','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND',to_date('14-OCT-2024 20:39:53','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND');
 Insert into PLAYGROUND.E_LOV (ID,KEY,VALUE,TYPE,CREATED,CREATED_BY,UPDATED,UPDATED_BY) values (2,'BREAKFAST_PRICE_PER_PERSON','800','HOTEL_REF',to_date('04-OCT-2024 00:00:00','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND',to_date('14-OCT-2024 20:50:26','DD-MON-YYYY HH24:MI:SS'),'MNIKOLIC');
 Insert into PLAYGROUND.E_LOV (ID,KEY,VALUE,TYPE,CREATED,CREATED_BY,UPDATED,UPDATED_BY) values (181,'0','46','DASH_HOTEL_UTIL',to_date('31-OCT-2024 00:00:00','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND',to_date('22-NOV-2024 12:23:39','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND');
+Insert into PLAYGROUND.E_LOV (ID,KEY,VALUE,TYPE,CREATED,CREATED_BY,UPDATED,UPDATED_BY) values (201,'Nije se pojavio','NO SHOW','RES_STATUS_MAPPING',to_date('28-NOV-2024 10:13:36','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND',to_date('28-NOV-2024 10:13:36','DD-MON-YYYY HH24:MI:SS'),'PLAYGROUND');

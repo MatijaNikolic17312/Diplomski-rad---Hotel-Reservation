@@ -4,15 +4,14 @@ SKRIPTA		: 70_HOTEL_RES_Scheduler_Objects_DDL.sql
 OPIS		: DDL skripita za Scheduler poslove (jobs) i programe
 		
 			Programi:
-				--P01 PLAYGROUND.PROG_RUN_POPULATE_TMP_ROOM_UTIL
 				--P02 PLAYGROUND.PROG_MAIL_SEND_CANCEL_RESERVATION
 				--P03 PLAYGROUND.PROG_MAIL_SEND_CHECK_IN_CONFIRMATION
 				--P04 PLAYGROUND.PROG_MAIL_SEND_CHECK_IN_LINK
 				--P05 PLAYGROUND.PROG_MAIL_SEND_CONFIRMATION_RESERVATION
 				--P06 PLAYGROUND.PROG_MAIL_SEND_SUCCESSFUL_RESERVATION
+				--P07 PLAYGROUND.PROG_MAIL_SEND_NOSHOW
 			Poslovi:	
 				--J01 PLAYGROUND.JOB_CALC_CURRENT_HOTEL_UTIL
-				--J02 PLAYGROUND.JOB_POPULATE_TMP_ROOM_UTILIZATION
 				--J03 PLAYGROUND.MAKE_RESERVATION_CHECK_IN_OPEN
 
 AUTOR		: M.Nikolic
@@ -23,33 +22,14 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.1.0			DEC-02-2024		Nov program vezan za dashboard
+								Uklonjen program i job ranije
+								korišćen za dashboard				M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 /********************************
 	PROGRAMI
 *********************************/
---P01 PLAYGROUND.PROG_RUN_POPULATE_TMP_ROOM_UTIL
-BEGIN 
-    dbms_scheduler.create_program
-    (
-        '"PROG_RUN_POPULATE_TMP_ROOM_UTIL"',
-        'PLSQL_BLOCK',
-        'DECLARE
-            period_start_dt DATE;
-            period_end_dt   DATE;
-        BEGIN
-            period_start_dt := sysdate - 30;
-            period_end_dt := sysdate;
-            populate_tmp_room_utilization(period_start_dt => period_start_dt, period_end_dt => period_end_dt);
-        END;',
-        0,
-        TRUE,
-        'Program that runs procedure POPULATE_TMP_ROOM_UTIL'
-    );
-    COMMIT; 
-END; 
-/
-
 --P02 PLAYGROUND.PROG_MAIL_SEND_CANCEL_RESERVATION
 BEGIN 
     dbms_scheduler.create_program
@@ -125,6 +105,20 @@ BEGIN
 END; 
 /
 
+--P07 PLAYGROUND.PROG_MAIL_SEND_NOSHOW
+BEGIN 
+	dbms_scheduler.create_program
+	(
+		'"PROG_MAIL_SEND_NOSHOW"',
+		'STORED_PROCEDURE',
+		'PLAYGROUND.MAIL_SENDING_TEMPLATES2.SEND_NOSHOW',
+		2, 
+		FALSE,
+		'Program to async send successful reservation mail'
+	);
+	COMMIT; 
+END; 
+/ 
 
 /********************************
 	POSLOVI
@@ -165,26 +159,6 @@ BEGIN
     );
     sys.dbms_scheduler.set_attribute('"JOB_CALC_CURRENT_HOTEL_UTIL"','NLS_ENV','NLS_LANGUAGE=''AMERICAN'' NLS_TERRITORY=''AMERICA'' NLS_CURRENCY=''$'' NLS_ISO_CURRENCY=''AMERICA'' NLS_NUMERIC_CHARACTERS=''.,'' NLS_CALENDAR=''GREGORIAN'' NLS_DATE_FORMAT=''DD-MON-YYYY HH24:MI:SS'' NLS_DATE_LANGUAGE=''AMERICAN'' NLS_SORT=''BINARY'' NLS_TIME_FORMAT=''HH.MI.SSXFF AM'' NLS_TIMESTAMP_FORMAT=''DD-MON-RR HH.MI.SSXFF AM'' NLS_TIME_TZ_FORMAT=''HH.MI.SSXFF AM TZR'' NLS_TIMESTAMP_TZ_FORMAT=''DD-MON-RR HH.MI.SSXFF AM TZR'' NLS_DUAL_CURRENCY=''$'' NLS_COMP=''BINARY'' NLS_LENGTH_SEMANTICS=''BYTE'' NLS_NCHAR_CONV_EXCP=''FALSE''');
     dbms_scheduler.enable('"JOB_CALC_CURRENT_HOTEL_UTIL"');
-    COMMIT; 
-END; 
-/ 
-
---J02 PLAYGROUND.JOB_POPULATE_TMP_ROOM_UTILIZATION
-BEGIN 
-    dbms_scheduler.create_job
-    (
-        '"JOB_POPULATE_TMP_ROOM_UTILIZATION"',
-        program_name=>'"PROG_RUN_POPULATE_TMP_ROOM_UTIL"',
-        start_date=>TO_TIMESTAMP_TZ('31-OCT-2024 07.31.00.512205000 PM EUROPE/BELGRADE','DD-MON-RRRR HH.MI.SSXFF AM TZR','NLS_DATE_LANGUAGE=english'),
-        repeat_interval=> 'FREQ=DAILY;BYTIME=060000;BYDAY=MON,TUE,WED,THU,FRI,SAT,SUN',
-        end_date=>NULL,
-        job_class=>'"DEFAULT_JOB_CLASS"',
-        enabled=>FALSE,
-        auto_drop=>FALSE,
-        comments=>'Job that runs the program PROG_RUN_POPULATE_TMP_ROOM_UTIL'
-    );
-    sys.dbms_scheduler.set_attribute('"JOB_POPULATE_TMP_ROOM_UTILIZATION"','NLS_ENV','NLS_LANGUAGE=''AMERICAN'' NLS_TERRITORY=''AMERICA'' NLS_CURRENCY=''$'' NLS_ISO_CURRENCY=''AMERICA'' NLS_NUMERIC_CHARACTERS=''.,'' NLS_CALENDAR=''GREGORIAN'' NLS_DATE_FORMAT=''DD-MON-YYYY HH24:MI:SS'' NLS_DATE_LANGUAGE=''AMERICAN'' NLS_SORT=''BINARY'' NLS_TIME_FORMAT=''HH.MI.SSXFF AM'' NLS_TIMESTAMP_FORMAT=''DD-MON-RR HH.MI.SSXFF AM'' NLS_TIME_TZ_FORMAT=''HH.MI.SSXFF AM TZR'' NLS_TIMESTAMP_TZ_FORMAT=''DD-MON-RR HH.MI.SSXFF AM TZR'' NLS_DUAL_CURRENCY=''$'' NLS_COMP=''BINARY'' NLS_LENGTH_SEMANTICS=''BYTE'' NLS_NCHAR_CONV_EXCP=''FALSE''');
-    dbms_scheduler.enable('"JOB_POPULATE_TMP_ROOM_UTILIZATION"');
     COMMIT; 
 END; 
 / 

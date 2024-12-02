@@ -9,7 +9,7 @@ OPIS		: DDL skripita za poglede(views)
 				--V03 PLAYGROUND.V_DASH_BREAKFAST
 				--V04 PLAYGROUND.V_DASH_CURR_HOTEL_UTILIZATION
 				--V05 PLAYGROUND.V_DASH_LATEST_GUEST_NUM
-				--V06 PLAYGROUND.V_DASH_NUM_OF_DAYS
+				--V06 PLAYGROUND.V_DASH_LENGTH_OF_STAY
 				--V07 PLAYGROUND.V_DASH_PRICE_RANGE
 				--V08 PLAYGROUND.V_DASH_ROOM_UTILZATION
 				--V09 PLAYGROUND.V_RES_STATUS_MAPPING
@@ -23,6 +23,8 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.1.0			DEC-02-2024		Ispravke u pogledima potrebnim za
+								rad dashboard-a						M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 
@@ -86,20 +88,11 @@ CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_BREAKFAST"
 )
 AS 
 	select 
-    	case breakfast_inc
-        	when 'Y' then 'Sa doruckom'
-        	when 'N' then 'Bez dorucka'
-    	end label,
-    	num_of_b value
-	from 
-	(  
-		select 
-            breakfast_inc,
-            count(*) num_of_b
-        from e_reservations
-        group by breakfast_inc
-	)
-;
+    	"LABEL",
+		"VALUE"
+	from dash_breakfast();
+
+COMMENT ON TABLE "PLAYGROUND"."V_DASH_BREAKFAST"  IS 'Breakfast chosen option Y or N in last 30 days';
 
 --V04 PLAYGROUND.V_DASH_CURR_HOTEL_UTILIZATION
 CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_CURR_HOTEL_UTILIZATION" 
@@ -127,40 +120,18 @@ AS
 	from TABLE ( get_latest_guest_num2(sysdate-30, sysdate) )
 ;
 
---V06 PLAYGROUND.V_DASH_NUM_OF_DAYS
-CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_NUM_OF_DAYS" 
+--V06 PLAYGROUND.V_DASH_LENGTH_OF_STAY
+CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_LENGTH_OF_STAY" 
 (
 	"LABEL", 
 	"VALUE", 
 	"COLOR"
-) 
-AS 
-  	select 
-    	substr(num_days, 4) label, 
-    	value ,
-    	case num_days
-    	    when '1. 1-5 dana' then 'green'
-        	when '2. 6-10 dana' then 'blue'
-        	when '3. 11-15 dana' then 'red'
-        	else 'gold'
-    	end color
-	from
-    (
-        select num_days, count(*) value from
-            (
-				select 
-                	case
-                    	when trunc(end_dt-start_dt) <= 5 then '1. 1-5 dana'
-                    	when trunc(end_dt-start_dt) <= 10 and trunc(end_dt-start_dt) > 5 then '2. 6-10 dana'
-                    	when trunc(end_dt-start_dt) <= 15 and trunc(end_dt-start_dt) > 10 then '3. 11-15 dana'
-                    	else '4. 16+ dana'
-                	end num_days
-            	from e_reservations
-			)
-        group by num_days
-        order by num_days
-	)
-;
+) AS 
+	select 
+		"LABEL",
+		"VALUE",
+		"COLOR" 
+	from dash_length_of_stay();
 
 --V07 PLAYGROUND.V_DASH_PRICE_RANGE
 CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_PRICE_RANGE" 
@@ -171,32 +142,10 @@ CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_PRICE_RANGE"
 )
 AS 
   	select 
-    	label, 
-    	value,
-    	case label
-        	when '0-1000 rsd.' then 'green'
-        	when '1001-2500 rsd.' then 'blue'
-        	when '2501-5000 rsd.' then 'red'
-        	else 'gold'
-    	end color
-	from
-	(   
-		select price label, count(*) value
-    	from 
-    	(   
-			select 
-            	case 
-                	when price <= 1000 then '0-1000 rsd.'
-                	when price <= 2500 and price > 1000 then '1001-2500 rsd.'
-                	when price <= 5000 and price > 2500 then '2501-5000 rsd.'
-                	else '5000+ rsd.'
-           		end price
-        	from e_reservations
-    	)
-    	group by price
-    	order by price
-	)
-;
+		"LABEL",
+		"VALUE",
+		"COLOR" 
+	from dash_price_range();
 
 --V08 PLAYGROUND.V_DASH_ROOM_UTILZATION
 CREATE OR REPLACE FORCE EDITIONABLE VIEW "PLAYGROUND"."V_DASH_ROOM_UTILZATION" 

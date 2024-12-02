@@ -3,10 +3,13 @@ APLIKACIJA	: Hotel Reservation - Diplomski rad
 SKRIPTA		: 60_HOTEL_RES_Functions_DDL.sql
 OPIS		: DDL skripita za funkcije
 		
-			Procedure:	
+			Funkcije:	
 				--F01 PLAYGROUND.CHECK_AVAILABILITY
 				--F02 PLAYGROUND.GET_LATEST_GUEST_NUM2
 				--F03 PLAYGROUND.GET_ROOM_OFFER
+				--F04 PLAYGROUND.DASH_BREAKFAST
+				--F05 PLAYGROUND.DASH_LENGTH_OF_STAY
+				--F06 PLAYGROUND.DASH_PRICE_RANGE
 
 AUTOR		: M.Nikolic
 VERZIJA     : 1.0.0
@@ -16,6 +19,7 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.1.0			DEC-02-2024		Nove funkcije za dashboard			M.Nikolic
 1.0.1			NOV-27-2024		Ispravke u F02						M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
@@ -98,8 +102,8 @@ CREATE OR REPLACE EDITIONABLE FUNCTION "PLAYGROUND"."GET_ROOM_OFFER"
 	END_DATE 		IN DATE,
 	NUM_PERSONS 	IN NUMBER 
 ) RETURN CLOB sql_macro AS
- query_str CLOB;
- breakfast_price varchar(10);
+	query_str CLOB;
+	breakfast_price varchar(10);
 BEGIN
  
  select value into breakfast_price from e_lov where key = 'BREAKFAST_PRICE_PER_PERSON' and type = 'HOTEL_REF';
@@ -124,4 +128,115 @@ where start_date between p.start_validity_dt and p.end_validity_dt';
  RETURN query_str;
 END GET_ROOM_OFFER;
 
+/
+
+--F04 PLAYGROUND.DASH_BREAKFAST
+create or replace FUNCTION "PLAYGROUND"."DASH_BREAKFAST"
+(
+    PERIOD_START_DT IN DATE DEFAULT sysdate - 30, 
+    PERIOD_END_DT   IN DATE default sysdate
+) RETURN CLOB SQL_MACRO AS 
+    query_str clob;
+BEGIN
+    query_str := '
+    select
+        case breakfast_inc
+            when ''Y'' then ''Sa doruckom''
+            when ''N'' then ''Bez dorucka''
+        end label,
+        num_of_b value
+    from 
+    (
+        select 
+            breakfast_inc,
+            count(*) num_of_b
+        from e_reservations
+        where start_dt between period_start_dt and period_end_dt
+        group by breakfast_inc
+    )';
+    
+    return query_str;
+END DASH_BREAKFAST;
+/
+
+--F05 PLAYGROUND.DASH_LENGTH_OF_STAY
+create or replace FUNCTION "PLAYGROUND"."DASH_LENGTH_OF_STAY"
+(
+    PERIOD_START_DT IN DATE DEFAULT sysdate - 30, 
+    PERIOD_END_DT   IN DATE default sysdate
+) RETURN CLOB SQL_MACRO AS 
+    query_str clob;
+BEGIN
+    query_str := '
+    select 
+        substr(num_days, 4) label, 
+        value ,
+        case num_days
+            when ''1. 1-5 dana'' then ''green''
+            when ''2. 6-10 dana'' then ''blue''
+            when ''3. 11-15 dana'' then ''red''
+            else ''gold''
+        end color
+    from
+    (
+        select num_days, count(*) value from
+            (
+                select 
+                    case
+                        when trunc(end_dt-start_dt) <= 5 then ''1. 1-5 dana''
+                        when trunc(end_dt-start_dt) <= 10 and trunc(end_dt-start_dt) > 5 then ''2. 6-10 dana''
+                        when trunc(end_dt-start_dt) <= 15 and trunc(end_dt-start_dt) > 10 then ''3. 11-15 dana''
+                        else ''4. 16+ dana''
+                    end num_days
+                from e_reservations
+                where start_dt between period_start_dt and period_end_dt
+            )
+        group by num_days
+        order by num_days
+    )';
+    
+    return query_str;
+END DASH_LENGTH_OF_STAY;
+/
+
+
+--F06 PLAYGROUND.DASH_PRICE_RANGE
+create or replace FUNCTION "PLAYGROUND"."DASH_PRICE_RANGE" 
+(
+    PERIOD_START_DT IN DATE DEFAULT sysdate - 30, 
+    PERIOD_END_DT   IN DATE default sysdate
+) RETURN CLOB SQL_MACRO AS 
+    query_str clob;
+BEGIN
+    query_str := '
+    select 
+        label, 
+        value,
+        case label
+            when ''0-1000 rsd.'' then ''green''
+            when ''1001-2500 rsd.'' then ''blue''
+            when ''2501-5000 rsd.'' then ''red''
+            else ''gold''
+        end color
+    from
+    (   
+        select price label, count(*) value
+        from 
+        (   
+            select 
+                case 
+                    when price <= 1000 then ''0-1000 rsd.''
+                    when price <= 2500 and price > 1000 then ''1001-2500 rsd.''
+                    when price <= 5000 and price > 2500 then ''2501-5000 rsd.''
+                    else ''5000+ rsd.''
+                end price
+            from e_reservations
+            where start_dt between period_start_dt and period_end_dt
+        )
+        group by price
+        order by price
+    )';
+    
+    return query_str;
+END DASH_PRICE_RANGE;
 /

@@ -15,6 +15,8 @@ ISTORIJA REVIZIJE
 ===============================================================================
 REVIZIJA    |  	DATUM     	|  	OPIS IZMENA						  | POTPIS
 -------------------------------------------------------------------------------
+1.1.0			DEC-02-2024		Dodata nova procedura za slanje
+								mejla kada se gost ne pojavi		M.Nikolic
 1.0.0   	 	NOV-20-2024   	Inicijalna verzija					M.Nikolic
 ********************************************************************************/
 /********************************
@@ -48,6 +50,12 @@ CREATE OR REPLACE EDITIONABLE PACKAGE "PLAYGROUND"."MAIL_SENDING_TEMPLATES2" AS
     );
 
     procedure send_cancel_reservation
+    (
+        mail in varchar2,
+        reservation_cd in varchar2
+    );
+
+	procedure send_noshow
     (
         mail in varchar2,
         reservation_cd in varchar2
@@ -227,6 +235,39 @@ CREATE OR REPLACE EDITIONABLE PACKAGE BODY "PLAYGROUND"."MAIL_SENDING_TEMPLATES2
             when others then
                 sent := 'false';
     end send_cancel_reservation;
+
+
+	procedure send_noshow
+    (
+        mail in varchar2,
+        reservation_cd in varchar2
+    ) AS
+        sent_mail_flg varchar2(2);
+        sent varchar2(6);
+    BEGIN
+        --Get send mail flag
+        select value into sent_mail_flg from e_lov where key = 'SEND_MAIL_FLG' and type = 'SYS_CONFIG';
+        
+        if sent_mail_flg = 'Y'
+        then
+            --Mail sending
+            playground.send_mail
+            (
+                p_to        =>  mail,
+                p_subject   =>  'Niste se pojavili',
+                p_message   =>  'Poštovani, ' || UTL_TCP.crlf || 'Niste se pojavili u hotelu na ime Vase rezervacije br. ' || reservation_cd || '.' || UTL_TCP.crlf || 
+                                'Vase ime se sada nalazi na crnoj listi, te necete moci vise rezervisatni smestaj u nasem hotelu.' || UTL_TCP.crlf || 'Pozdrav.'
+            );
+            sent := 'true';
+        else
+            sent := 'false';
+        end if;
+        
+        --Exception procesing
+        exception
+            when others then
+                sent := 'false';
+    end send_noshow;
     
 
 END MAIL_SENDING_TEMPLATES2;
@@ -261,6 +302,12 @@ CREATE OR REPLACE EDITIONABLE PACKAGE "PLAYGROUND"."WRAPPERS_MAIL_SENDING_TEMPLA
     );
 
     procedure send_cancel_reservation
+    (
+        mail in varchar2,
+        reservation_cd in varchar2
+    );
+
+	procedure send_noshow
     (
         mail in varchar2,
         reservation_cd in varchar2
@@ -457,6 +504,44 @@ CREATE OR REPLACE EDITIONABLE PACKAGE BODY "PLAYGROUND"."WRAPPERS_MAIL_SENDING_T
             when others then null;
             
     end send_cancel_reservation;
+
+
+	procedure send_noshow
+    (
+        mail in varchar2,
+        reservation_cd in varchar2
+    ) AS
+        job_name varchar2(20);
+    BEGIN
+        --Creating a random job-name
+        select DBMS_SCHEDULER.generate_job_name ('TEMP_JOB_') INTO job_name from dual;
+        
+        --Creating a job
+        DBMS_SCHEDULER.create_job
+        (   
+            job_name        =>  job_name ,
+            program_name    =>  'PROG_MAIL_SEND_NOSHOW',
+            start_date      =>  SYSTIMESTAMP,
+            auto_drop       =>  true,
+            repeat_interval =>  null,
+            end_date        =>  null
+        );
+        
+        --Passing arguments to the job                      
+        DBMS_SCHEDULER.set_job_argument_value(job_name, 1, mail);
+        DBMS_SCHEDULER.set_job_argument_value(job_name, 2, reservation_cd);
+        
+        --Specifying the the database should drop the job after it has run
+        DBMS_SCHEDULER.set_attribute(job_name,'max_runs',1);
+        
+        --Starting the job
+        DBMS_SCHEDULER.enable(job_name);
+        
+        --Exception procesing
+        exception
+            when others then null;
+            
+    end send_noshow;
     
 
 END WRAPPERS_MAIL_SENDING_TEMPLATES2;
